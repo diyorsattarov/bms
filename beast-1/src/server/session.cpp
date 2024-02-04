@@ -22,7 +22,7 @@ void session_::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   if (ec == http::error::end_of_stream)
     return do_close();
   if (ec)
-    return fail(ec, "read");
+    return fail(ec, "[beast-1] read");
   send_response(handle_request(app_, std::move(req_)));
 }
 

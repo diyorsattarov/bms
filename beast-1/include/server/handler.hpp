@@ -6,9 +6,9 @@
 #include <string>
 
 #include "../application.hpp"
-
+#include <nlohmann/json.hpp>
 namespace http = boost::beast::http;
-
+using json = nlohmann::json;
 void fail(beast::error_code ec, char const *what);
 template <class Body, class Allocator>
 http::message_generator

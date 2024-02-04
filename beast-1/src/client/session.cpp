@@ -25,7 +25,7 @@ void session::run(std::string host, std::string port, std::string target,
   req_.target(target);
   req_.set(http::field::host, host);
   req_.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-  req_.set(http::field::content_type, "application/json");
+  req_.set(http::field::content_type, "text/html");
   req_.set(http::field::body, body);
   req_.prepare_payload();
 
@@ -65,7 +65,7 @@ void session::on_write(beast::error_code ec, std::size_t bytes_transferred) {
 void session::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   boost::ignore_unused(bytes_transferred);
   if (ec)
-    return fail(ec, "read");
+    return fail(ec, "beast-1 read");
   stream_.socket().shutdown(tcp::socket::shutdown_both, ec);
   if (ec && ec != beast::errc::not_connected)
     return fail(ec, "shutdown");

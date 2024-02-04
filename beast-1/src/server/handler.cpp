@@ -18,15 +18,30 @@ handle_request(Application &app,
     res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
     res.set(http::field::content_type, "text/html");
     res.keep_alive(req.keep_alive());
-    res.body() = std::string(str);
+    res.body() = str;
     res.prepare_payload();
     return res;
   };
   if (req.method() == http::verb::post && req.target() == "/test") {
-    auto clientService = app.getClientService();
-    std::string response = clientService->makeRequest(
-        "localhost", "8081", "/test", "test", http::verb::post);
-    return http_response("ok_request", response);
+    try {
+      std::cout << req.body() << std::endl;
+      json reqBody = json::parse(req.body());
+      std::string username = reqBody["username"];
+      // auto clientService = app.getClientService();
+      auto userService = app.getUserService();
+      // std::string response = clientService->makeRequest(
+      //     "localhost", "8081", "/test", "test", http::verb::post);
+      std::cout << "test1" << std::endl;
+      userService->addUser(username);
+      std::cout << "test2" << std::endl;
+      int userSize = userService->getUsersSize();
+      std::cout << "userService->getUsersSize(): " << userSize << std::endl;
+      userService->printUsers();
+      return http_response("ok_request", "ok--beast-1");
+
+    } catch (const std::exception &e) {
+      return http_response("bad_request", "beast-1 -- invalid JSON body");
+    }
   }
   if (req.method() == http::verb::get && req.target() == "/test-beast2") {
     auto clientService = app.getClientService();

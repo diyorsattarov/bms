@@ -2,10 +2,30 @@
 
 #include "client/session.hpp"
 #include <memory>
+#include <string>
+
+class User {
+public:
+  User(const std::string &username);
+  std::string getUsername() const;
+
+private:
+  std::string username_;
+};
 
 class Service {
 public:
   virtual ~Service() = default;
+};
+
+class UserService {
+public:
+  void addUser(const std::string &username);
+  int getUsersSize() const;
+  void printUsers();
+
+private:
+  std::vector<User> users_;
 };
 
 class ClientService : public Service {
@@ -24,7 +44,9 @@ public:
   virtual ~Application() = default;
 
   std::shared_ptr<ClientService> getClientService() const;
+  std::shared_ptr<UserService> getUserService() const;
 
 private:
   std::shared_ptr<ClientService> clientService_;
+  std::shared_ptr<UserService> userService_;
 };
