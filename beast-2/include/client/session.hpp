@@ -24,7 +24,8 @@ public:
   void run(std::string host, std::string port, std::string target);
 
   void run(std::string host, std::string port, std::string target,
-           std::string body, http::verb method = http::verb::get);
+           std::string body, http::verb method,
+           std::function<void(std::string)> callback);
 
 private:
   void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
@@ -35,11 +36,16 @@ private:
   void on_write(beast::error_code ec, std::size_t bytes_transferred);
 
   void on_read(beast::error_code ec, std::size_t bytes_transferred);
+  void setCallback(std::function<void(std::string)> callback) {
+    callback_ = callback;
+  }
 
 private:
+  std::function<void(std::string)> callback_; // Add this line
   tcp::resolver resolver_;
   beast::tcp_stream stream_;
   beast::flat_buffer buffer_;
   http::request<http::empty_body> req_;
   http::response<http::string_body> res_;
+  std::string response_;
 };

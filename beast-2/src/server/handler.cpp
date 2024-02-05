@@ -22,14 +22,46 @@ handle_request(Application &app,
     res.prepare_payload();
     return res;
   };
-  if (req.method() == http::verb::post && req.target() == "/test") {
+  if (req.method() == http::verb::post && req.target() == "/test-2") {
     try {
-      std::cout << req.body() << std::endl;
       json reqBody = json::parse(req.body());
       std::string username = reqBody["username"];
+
+      // Create a new JSON response
+      json responseJson;
+      responseJson["username"] = "response_value"; // Modify as needed
+      std::string responseBodyStr = responseJson.dump();
+
+      // Use httplib to make the request
+      httplib::Client cli("localhost", 8080);
+      auto res = cli.Post("/test", responseBodyStr, "application/json");
+
+      if (res && res->status == 200) {
+        return http_response("ok_request", res->body);
+      } else {
+        return http_response("server_error", "beast-2 -- HTTP request failed");
+      }
+    } catch (const json::exception &e) {
+      return http_response("bad_request", "beast-2 -- invalid JSON format");
+    }
+  }
+  if (req.method() == http::verb::post && req.target() == "/test") {
+    try {
       auto clientService = app.getClientService();
+      json reqBody = json::parse(req.body());
+      std::string username = reqBody["username"];
+
+      // Your existing code for extracting username
+
+      // Create a new JSON response
+      json responseJson;
+      responseJson["username"] = "response_value"; // Modify as needed
+      std::string responseBodyStr = responseJson.dump();
+
+      // Make the request using the extracted username and new response JSON
       std::string response = clientService->makeRequest(
-          "localhost", "8080", "/test", username, http::verb::post);
+          "localhost", "8080", "/test", responseBodyStr, http::verb::post);
+
       return http_response("ok_request", response);
     } catch (const json::exception &e) {
       return http_response("bad_request", "beast-2 -- invalid JSON format");
