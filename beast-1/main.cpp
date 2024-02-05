@@ -1,4 +1,5 @@
 #include "include/server/listener.hpp"
+#include <iostream>
 #include <thread>
 #include <vector>
 int main(int argc, char *argv[]) {

@@ -1,21 +1,26 @@
 #pragma once
-
-#include "client/session.hpp"
+#include "post.hpp"
+#include "user.hpp"
+#include <iostream>
 #include <memory>
 #include <string>
-
-class User {
-public:
-  User(const std::string &username);
-  std::string getUsername() const;
-
-private:
-  std::string username_;
-};
+#include <vector>
 
 class Service {
 public:
   virtual ~Service() = default;
+};
+
+class PostService {
+public:
+  void addPost(const User &user, const std::string &title,
+               const std::string &body);
+  std::vector<Post> &getPosts();
+  int getPostsSize() const;
+  bool postExists(const int &id);
+
+private:
+  std::vector<Post> posts_;
 };
 
 class UserService {
@@ -23,19 +28,11 @@ public:
   void addUser(const std::string &username);
   int getUsersSize() const;
   void printUsers();
+  bool userExists(const std::string &username);
+  std::vector<User> &getUsers();
 
 private:
   std::vector<User> users_;
-};
-
-class ClientService : public Service {
-public:
-  std::string makeRequest(const std::string &host, const std::string &port,
-                          const std::string &target);
-
-  std::string makeRequest(const std::string &host, const std::string &port,
-                          const std::string &target, const std::string &body,
-                          http::verb method = http::verb::get);
 };
 
 class Application {
@@ -43,10 +40,10 @@ public:
   Application();
   virtual ~Application() = default;
 
-  std::shared_ptr<ClientService> getClientService() const;
   std::shared_ptr<UserService> getUserService() const;
+  std::shared_ptr<PostService> getPostService() const;
 
 private:
-  std::shared_ptr<ClientService> clientService_;
   std::shared_ptr<UserService> userService_;
+  std::shared_ptr<PostService> postService_;
 };

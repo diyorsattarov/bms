@@ -7,7 +7,10 @@
 
 #include "../application.hpp"
 #include <nlohmann/json.hpp>
-namespace http = boost::beast::http;
+namespace beast = boost::beast;
+namespace http = beast::http;
+namespace net = boost::asio;
+using tcp = boost::asio::ip::tcp;
 using json = nlohmann::json;
 void fail(beast::error_code ec, char const *what);
 template <class Body, class Allocator>

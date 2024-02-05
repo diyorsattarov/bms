@@ -1,40 +1,15 @@
 #include "../include/application.hpp"
 
-User::User(const std::string &username) : username_(username) {}
-
-std::string User::getUsername() const { return username_; }
-
 Application::Application()
-    : clientService_(std::make_shared<ClientService>()),
-      userService_(std::make_shared<UserService>()) {}
-
-std::shared_ptr<ClientService> Application::getClientService() const {
-  return clientService_;
-}
+    : userService_(std::make_shared<UserService>()),
+      postService_(std::make_shared<PostService>()) {}
 
 std::shared_ptr<UserService> Application::getUserService() const {
   return userService_;
 }
-std::string ClientService::makeRequest(const std::string &host,
-                                       const std::string &port,
-                                       const std::string &target) {
-  net::io_context client_ioc; // Separate io_context for the client
-  auto session_ptr = std::make_shared<session>(client_ioc);
-  session_ptr->run(host, port, target);
-  client_ioc.run();
-  return session_ptr->getResponse();
-}
 
-std::string ClientService::makeRequest(const std::string &host,
-                                       const std::string &port,
-                                       const std::string &target,
-                                       const std::string &body,
-                                       http::verb method) {
-  net::io_context client_ioc;
-  auto session_ptr = std::make_shared<session>(client_ioc);
-  session_ptr->run(host, port, target, body, method);
-  client_ioc.run();
-  return session_ptr->getResponse();
+std::shared_ptr<PostService> Application::getPostService() const {
+  return postService_;
 }
 
 void UserService::addUser(const std::string &username) {
@@ -48,3 +23,26 @@ void UserService::printUsers() {
     std::cout << user.getUsername() << std::endl;
   }
 }
+
+std::vector<User> &UserService::getUsers() { return users_; }
+
+bool UserService::userExists(const std::string &username) {
+  for (auto &user : users_) {
+    if (user.getUsername() == username)
+      return true;
+  }
+  return false;
+}
+
+void PostService::addPost(const User &user, const std::string &title,
+                          const std::string &body) {
+  posts_.emplace_back(user, title, body);
+}
+
+bool PostService::postExists(const int &id) {
+  return id > 0 && id <= posts_.size();
+}
+
+int PostService::getPostsSize() const { return posts_.size(); }
+
+std::vector<Post> &PostService::getPosts() { return posts_; }
